@@ -58,13 +58,9 @@ class Feed extends Component {
         return res.json();
       })
       .then(resData => {
+        console.log(resData.posts[0][0].creator)
         this.setState({
-          posts: resData.posts.map(post => {
-            return {
-              ...post,
-              imagePath: post.imageUrl
-            };
-          }),
+          posts: resData.posts[0],
           totalPosts: resData.totalItems,
           postsLoading: false
         });
@@ -110,20 +106,24 @@ class Feed extends Component {
     this.setState({
       editLoading: true
     });
-    const formData = new FormData();
-    formData.append('title', postData.title);
-    formData.append('content', postData.content);
-    formData.append('image', postData.image);
-    let url = 'http://localhost:8080/feed/post';
+    // Set up data (with image!)
+    let url = 'http://localhost:8080/feed/posts';
     let method = 'POST';
     if (this.state.editPost) {
-      url = 'http://localhost:8080/feed/post/' + this.state.editPost._id;
-      method = 'PUT';
+      url = 'URL';
     }
 
     fetch(url, {
       method: method,
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title: postData.title,
+        content: postData.content,
+        imageUrl:"name",
+        creator: { name:" name "}
+      })
     })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
@@ -253,7 +253,7 @@ class Feed extends Component {
                 <Post
                   key={post._id}
                   id={post._id}
-                  author={"post.creator.name"}
+                  author={post.creator.name}
                   date={new Date(post.createdAt).toLocaleDateString('en-US')}
                   title={post.title}
                   image={post.imageUrl}
