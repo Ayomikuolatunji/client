@@ -18,7 +18,7 @@ class App extends Component {
   state = {
     showBackdrop: false,
     showMobileNav: false,
-    isAuth: true,
+    isAuth: false,
     token: null,
     userId: null,
     authLoading: false,
@@ -105,7 +105,12 @@ class App extends Component {
       method:"PUT",
       headers:{
         "Content-Type":"application/json"
-      }
+      },
+      body:JSON.stringify({
+        email:authData.email,
+        password:authData.password,
+        name:authData.name
+      })
     })
       .then(res => {
         if (res.status === 422) {
