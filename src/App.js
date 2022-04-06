@@ -11,7 +11,6 @@ import FeedPage from './pages/Feed/Feed';
 import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
 import LoginPage from './pages/Auth/Login';
 import SignupPage from './pages/Auth/Signup';
-
 import './App.css';
 
 class App extends Component {
@@ -60,7 +59,16 @@ class App extends Component {
   loginHandler = (event, authData) => {
     event.preventDefault();
     this.setState({ authLoading: true });
-    fetch('URL')
+    fetch('http://localhost:8080/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: authData.email,
+        password: authData.password
+      })
+    })
       .then(res => {
         if (res.status === 422) {
           throw new Error('Validation failed.');
@@ -101,15 +109,15 @@ class App extends Component {
   signupHandler = (event, authData) => {
     event.preventDefault();
     this.setState({ authLoading: true });
-    fetch('http://localhost:8080/auth/signup',{
-      method:"PUT",
-      headers:{
-        "Content-Type":"application/json"
+    fetch('http://localhost:8080/auth/signup', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      body:JSON.stringify({
-        email:authData.signupForm.email,
-        password:authData.signupForm.password,
-        name:authData.signupForm.name
+      body: JSON.stringify({
+        email: authData.signupForm.email.value,
+        password: authData.signupForm.password.value,
+        name: authData.signupForm.name.value
       })
     })
       .then(res => {
