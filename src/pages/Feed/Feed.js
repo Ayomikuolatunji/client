@@ -8,6 +8,7 @@ import Paginator from '../../components/Paginator/Paginator';
 import Loader from '../../components/Loader/Loader';
 import ErrorHandler from '../../components/ErrorHandler/ErrorHandler';
 import './Feed.css';
+import post from '../../components/Feed/Post/Post';
 
 class Feed extends Component {
   state = {
@@ -133,7 +134,18 @@ class Feed extends Component {
     formData.append('content', postData.content);
     formData.append('image', postData.image);
       
-       let method = 'POST';
+      let method = 'POST';
+      const graphqlQuery={
+        query :`
+          mutation {
+            createPost(postInput:{title:"${postData.title}", content:"${postData.content}", imageUrl:"${"some url"}"})
+            {
+              _id,
+              title,
+              content,
+            }
+        }`
+      }
       fetch("http://localhost:8080", {
         method: method,
         body: formData,
