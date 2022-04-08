@@ -58,15 +58,15 @@ class App extends Component {
 
   loginHandler = (event, authData) => {
     event.preventDefault();
-    const graphqlQuery=`
-    query {
+    const graphqlQuery={
+    query : `{
       login(email:"${authData.email.value}",password:"${authData.password.value}")
       {
         userId,
         token,
       }
-    }
-    `
+    }`
+  }
     this.setState({ authLoading: true });
     fetch('http://localhost:8080/graphql', {
       method: 'POST',
@@ -76,12 +76,13 @@ class App extends Component {
       body: JSON.stringify(graphqlQuery)
     })
       .then(res => {
-        if (res.status === 422) {
-          throw new Error('Validation failed.');
+        if (res.errors && res.errors[0].status === 422) {
+          throw new Error(
+            "Validation failed. Make sure the email address isn't used yet!"
+          );
         }
-        if (res.status !== 200 && res.status !== 201) {
-          console.log('Error!');
-          throw new Error('Could not authenticate you!');
+        if (res.errors) {
+          throw new Error('User login failed!');
         }
         return res.json();
       })
