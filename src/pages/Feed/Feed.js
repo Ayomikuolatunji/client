@@ -59,7 +59,13 @@ class Feed extends Component {
            {
             posts {
               posts {
+                _id
                 title
+                content
+                imageUrl
+                creator
+                createdAt
+                updatedAt
               }
             }
            }
