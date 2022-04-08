@@ -60,7 +60,7 @@ class App extends Component {
     event.preventDefault();
     const graphqlQuery={
     query : `{
-      login(email:"${authData.email.value}",password:"${authData.password.value}")
+      login(email:"${authData.email}",password:"${authData.password}")
       {
         userId,
         token,
