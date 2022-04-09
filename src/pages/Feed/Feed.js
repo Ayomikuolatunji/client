@@ -54,42 +54,39 @@ class Feed extends Component {
       page--;
       this.setState({ postPage: page });
     }
-    const graphqlQuery={
-      query : `
-           {
+    const graphqlQuery = {
+      query: `
+        {
+          posts(page: ${page}) {
             posts {
-              posts {
-                _id
-                title
-                content
-
-                creator {
-                  name
-                }
-                createdAt
-                updatedAt
+              _id
+              title
+              content
+              creator {
+                name
               }
+              createdAt
             }
-           }
+            totalPosts
+          }
+        }
       `
-    }
+    };
     fetch('http://localhost:8080/graphql', {
       method: 'POST',
-      body: JSON.stringify(graphqlQuery),
       headers: {
         Authorization: 'Bearer ' + this.props.token,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify(graphqlQuery)
     })
-      .then(resData => {
-
-        if (resData.errors) {
-          throw new Error('fetching posts failed!');
-        }
-        return resData.json();
+      .then(res => {
+        return res.json();
       })
       .then(resData => {
-        console.log(resData); 
+        if (resData.errors) {
+          throw new Error('Fetching posts failed!');
+        }
         this.setState({
           posts: resData.data.posts.posts.map(post => {
             return {
@@ -97,7 +94,7 @@ class Feed extends Component {
               imagePath: post.imageUrl
             };
           }),
-          totalPosts: resData.totalItems,
+          totalPosts: resData.data.posts.totalPosts,
           postsLoading: false
         });
       })
@@ -195,6 +192,7 @@ class Feed extends Component {
         if (resData.errors) {
           throw new Error('User login failed!');
         }
+        console.log(resData);
         const post = {
           _id: resData.data.createPost._id,
           title: resData.data.createPost.title,
@@ -203,7 +201,18 @@ class Feed extends Component {
           createdAt: resData.data.createPost.createdAt
         };
         this.setState(prevState => {
+          let updatedPosts = [...prevState.posts];
+          if (prevState.editPost) {
+            const postIndex = prevState.posts.findIndex(
+              p => p._id === prevState.editPost._id
+            );
+            updatedPosts[postIndex] = post;
+          } else {
+            updatedPosts.pop();
+            updatedPosts.unshift(post);
+          }
           return {
+            posts: updatedPosts,
             isEditing: false,
             editPost: null,
             editLoading: false
